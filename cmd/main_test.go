@@ -6,6 +6,10 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	"elevator/model/common"
+	"elevator/model/elevator"
+	"elevator/model/user"
 )
 
 // type User struct {
@@ -14,7 +18,7 @@ import (
 // }
 
 func TestElevatorSystem(t *testing.T) {
-	ctrl := NewElevatorCtrl()
+	ctrl := elevator.NewElevatorCtrl()
 	totalRequests := 40
 	var wg sync.WaitGroup
 	wg.Add(totalRequests)
@@ -23,14 +27,14 @@ func TestElevatorSystem(t *testing.T) {
 	startTime := time.Now()
 
 	for i := 0; i < totalRequests; i++ {
-		user := User{
+		user := user.UserInfo{
 			Name:   fmt.Sprintf("User%d", i+1),
 			UserId: i + 1,
 		}
-		req := Request{
+		req := common.Request{
 			Name: user.Name,
 		}
-		go func(u User) {
+		go func(u common.Request) {
 			defer wg.Done()
 			from := rand.Intn(10) + 1
 			to := rand.Intn(10) + 1
@@ -39,15 +43,15 @@ func TestElevatorSystem(t *testing.T) {
 			}
 			idleElevator := ctrl.FindIdleElevator()
 			if idleElevator != nil {
-				fmt.Printf("%s (UserID: %d) requests elevator from %d to %d\n", u.Name, u.UserId, from, to)
+				fmt.Printf("%s requests elevator from %d to %d\n", u.Name, from, to)
 				// 將操作電梯的指令送往 channel
-				cmd := CMD{
-					//Request: req,
+				cmd := elevator.CMD{
+					Request: req,
 				}
 				idleElevator.MoveChan <- cmd
 			}
 			time.Sleep(1 * time.Second) // 每秒產生一個請求
-		}(user)
+		}(req)
 	}
 
 	wg.Wait()
