@@ -8,11 +8,6 @@ import (
 	"time"
 )
 
-// type User struct {
-// 	Name   string `json:"name"`
-// 	UserId int    `json:"userId"`
-// }
-
 func TestElevatorSystem(t *testing.T) {
 	ctrl := NewElevatorCtrl()
 	totalRequests := 40
@@ -32,17 +27,19 @@ func TestElevatorSystem(t *testing.T) {
 		}
 		go func(u User) {
 			defer wg.Done()
-			from := rand.Intn(10) + 1
-			to := rand.Intn(10) + 1
-			for from == to {
-				to = rand.Intn(10) + 1
+			// 隨機決定 樓層跟目的
+			req.From = rand.Intn(10) + 1
+			req.To = rand.Intn(10) + 1
+			for req.From == req.To {
+				req.To = rand.Intn(10) + 1
 			}
+			// 尋找空閑的電梯
 			idleElevator := ctrl.FindIdleElevator()
 			if idleElevator != nil {
-				fmt.Printf("%s (UserID: %d) requests elevator from %d to %d\n", u.Name, u.UserId, from, to)
+				fmt.Printf("%s (UserID: %d) requests elevator from %d to %d\n", u.Name, u.UserId, req.From, req.To)
 				// 將操作電梯的指令送往 channel
 				cmd := CMD{
-					//Request: req,
+					Request: req,
 				}
 				idleElevator.MoveChan <- cmd
 			}

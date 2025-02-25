@@ -27,6 +27,6 @@ lint:
 
 test:
 	@echo "Running tests..."
-	@go test $(SRC_DIR)/...
+	@go test $(SRC_DIR)/main_test.go
 
 .PHONY: all build run clean fmt lint test
