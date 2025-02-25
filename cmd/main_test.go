@@ -27,6 +27,9 @@ func TestElevatorSystem(t *testing.T) {
 			Name:   fmt.Sprintf("User%d", i+1),
 			UserId: i + 1,
 		}
+		req := Request{
+			Name: user.Name,
+		}
 		go func(u User) {
 			defer wg.Done()
 			from := rand.Intn(10) + 1
@@ -37,8 +40,11 @@ func TestElevatorSystem(t *testing.T) {
 			idleElevator := ctrl.FindIdleElevator()
 			if idleElevator != nil {
 				fmt.Printf("%s (UserID: %d) requests elevator from %d to %d\n", u.Name, u.UserId, from, to)
-				idleElevator.MoveChan <- from
-				idleElevator.MoveChan <- to
+				// 將操作電梯的指令送往 channel
+				cmd := CMD{
+					//Request: req,
+				}
+				idleElevator.MoveChan <- cmd
 			}
 			time.Sleep(1 * time.Second) // 每秒產生一個請求
 		}(user)
